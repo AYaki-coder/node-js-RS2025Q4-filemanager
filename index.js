@@ -1,29 +1,16 @@
-const { createInterface } = require("node:readline/promises");
-
-const argName = "--username";
-const separator = "=";
+import { createInterface } from "node:readline/promises";
+import { Controller } from "./controller.js";
 
 try {
-    const args = process.argv.slice(2);
-    const usernameValue = args.find((x) => x.startsWith(argName + separator))?.slice((argName + separator).length);
-    const username = usernameValue ? usernameValue : "Anonymous";
-    console.log(`Welcome to the File Manager, ${username}!`);
-
     const rl = createInterface({
         input: process.stdin,
         output: process.stdout,
     });
 
-    rl.on("line", (line) => {
-        console.log(`Received: ${line}`);
-        if (line === ".exit") {
-            rl.close();
-        }
-    });
+    const controller = new Controller(rl);
 
-    rl.on("close", () => {
-        console.log(`Thank you for using File Manager, ${username}, goodbye!`);
-    });
+    rl.on("line", (x) => controller.handleLine(x));
+    rl.on("close", controller.sayGoodBye);
 } catch (error) {
     console.error(error);
 }
