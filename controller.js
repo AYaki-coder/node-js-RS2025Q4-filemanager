@@ -12,6 +12,7 @@ export class Controller {
         this.rl = rl;
         this.username = this.getUserName();
         this.sayHello();
+        process.chdir(os.homedir());
         this.printWorkingDir();
     }
 
@@ -30,19 +31,25 @@ export class Controller {
     };
 
     printWorkingDir() {
-        console.log(`You are currently in ${os.homedir()} \n`);
+        console.log(`You are currently in ${process.cwd()} \n`);
     }
 
     handleLine(line) {
         if (line === ".exit") {
             this.rl.close();
         }
-        const handler = this.handlerList.find((x) => x.canHandle(line));
+        console.log(line);
+        const [command, ...args] = line.split(" ").filter((x) => x);
+        const handler = this.handlerList.find((x) => x.canHandle(command));
 
         if (!handler) {
             console.log("Invalid input \n");
         } else {
-            handler.handle(line);
+            try {
+                handler.handle(command, args);
+            } catch (error) {
+                console.log("Operation failed \n");
+            }
         }
 
         this.printWorkingDir();
