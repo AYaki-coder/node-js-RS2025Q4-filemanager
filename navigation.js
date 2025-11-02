@@ -12,6 +12,7 @@ export class Navigation {
 
     handle(command, args) {
         console.log(`Module Navigation received: command -- ${command} and args -- ${args}`);
+        const errorMessage = "Invalid input";
 
         switch (command) {
             case "up":
@@ -19,11 +20,15 @@ export class Navigation {
                 break;
 
             case "cd":
-                this.changeDir(args);
+                this.changeDir(args, errorMessage);
                 break;
 
             case "ls":
                 this.list();
+                break;
+
+            default:
+                console.log(errorMessage);
                 break;
         }
     }
@@ -33,13 +38,16 @@ export class Navigation {
         process.chdir(p);
     }
 
-    changeDir(args) {
+    changeDir(args, message) {
         if (args.length !== 1) {
-            throw Error("invalid path!");
+            console.log(message);
         }
-        console.log("args", args);
-        const p = path.resolve(process.cwd(), args.join());
-        process.chdir(p);
+        try {
+            const p = path.resolve(process.cwd(), args.join());
+            process.chdir(p);
+        } catch {
+            console.log(message);
+        }
     }
 
     async list() {
