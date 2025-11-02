@@ -1,26 +1,22 @@
 import path from "node:path";
 import { readdir } from "node:fs/promises";
+import { InvalidInput } from "./invalid-input.js";
+import { validateArgs } from "./utils.js";
 
 export class Navigation {
-    constructor() {
-        this.commandList = ["up", "cd", "ls"];
-    }
-
     canHandle(command) {
+        this.commandList = ["up", "cd", "ls"];
         return this.commandList.find((x) => x === command);
     }
 
     handle(command, args) {
-        console.log(`Module Navigation received: command -- ${command} and args -- ${args}`);
-        const errorMessage = "Invalid input";
-
         switch (command) {
             case "up":
                 this.up();
                 break;
 
             case "cd":
-                this.changeDir(args, errorMessage);
+                this.changeDir(args);
                 break;
 
             case "ls":
@@ -28,8 +24,7 @@ export class Navigation {
                 break;
 
             default:
-                console.log(errorMessage);
-                break;
+                throw new InvalidInput();
         }
     }
 
@@ -38,15 +33,13 @@ export class Navigation {
         process.chdir(p);
     }
 
-    changeDir(args, message) {
-        if (args.length !== 1) {
-            console.log(message);
-        }
+    changeDir(args) {
+        validateArgs(args, 1);
         try {
             const p = path.resolve(process.cwd(), args.join());
             process.chdir(p);
         } catch {
-            console.log(message);
+            throw new InvalidInput();
         }
     }
 

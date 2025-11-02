@@ -1,21 +1,14 @@
 import { EOL, cpus, homedir, userInfo, arch } from "node:os";
+import { validateArgs } from "./utils.js";
+import { InvalidInput } from "./invalid-input.js";
 
 export class OperatingSystemInfo {
-    constructor() {
-        this.commandList = [];
-    }
-
     canHandle(command) {
         return command === "os";
     }
 
-    handle(command, args) {
-        console.log(`Module OperatingSystemInfo received:: command -- ${command} and args -- ${args}`);
-        const errorMessage = "Invalid input";
-
-        if (args.length != 1) {
-            console.log(errorMessage);
-        }
+    handle(_, args) {
+        validateArgs(args, 1);
 
         const arg = args.join();
 
@@ -41,8 +34,7 @@ export class OperatingSystemInfo {
                 break;
 
             default:
-                console.log(errorMessage);
-                break;
+                throw new InvalidInput();
         }
     }
 }

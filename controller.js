@@ -5,6 +5,7 @@ import os from "node:os";
 import { Hash } from "./hash.js";
 import { OperatingSystemInfo } from "./operating-system-info.js";
 import { Navigation } from "./navigation.js";
+import { InvalidInput } from "./invalid-input.js";
 
 export class Controller {
     constructor(rl) {
@@ -34,23 +35,18 @@ export class Controller {
         console.log(`You are currently in ${process.cwd()} \n`);
     }
 
-    handleLine(line) {
+    async handleLine(line) {
         if (line === ".exit") {
             this.rl.close();
         }
-        console.log(line);
         const [command, ...args] = line.split(" ").filter((x) => x);
         const handler = this.handlerList.find((x) => x.canHandle(command));
 
         if (!handler) {
-            console.log("Invalid input \n");
-        } else {
-            try {
-                handler.handle(command, args);
-            } catch (error) {
-                console.log("Operation failed \n");
-            }
+            throw new InvalidInput();
         }
+
+        await handler.handle(command, args);
 
         this.printWorkingDir();
     }
